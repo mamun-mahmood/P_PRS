@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import BottomNavigation from "@mui/material/BottomNavigation";
@@ -11,7 +11,7 @@ import ListIcon from "@mui/icons-material/List";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 // import SettingsIcon from "@mui/icons-material/Settings";
-import * as Realm from "realm-web";
+// import * as Realm from "realm-web";
 import AddNewWord from "../Components/AddNewWord";
 import EditWord from "../Components/EditWord";
 import Dictionary from "./Dictionary";
@@ -19,43 +19,33 @@ import Practice from "./Practice";
 import Account from "./Account";
 import Setting from "./Setting";
 import { useAuth } from "../Components/AuthContext";
+import { collection, getDocs } from "firebase/firestore";
+import db from "../Components/Firebase";
 export default function Homepage() {
   const ref = React.useRef(null);
   const [value, setValue] = React.useState(0);
   const [allWords, setAllWords] = React.useState([]);
+  const [allWord, setAllWord] = React.useState([]);
   const [searchWord, setSearchWord] = React.useState("");
   const { currentUser } = useAuth();
   const [dataLoading, setDataLoading] = React.useState(false);
   const [userId, setUserId] = React.useState("");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(async () => {
-    setDataLoading(true);
-    const REALM_APP_ID = "realmappwordstore-mgzfz";
-    const app = new Realm.App({ id: REALM_APP_ID });
-    const credentials = Realm.Credentials.jwt(currentUser.accessToken);
-    try {
-      const user = await app.logIn(credentials);
-      const words = await user.functions.getAllWords("project=" + user.id);
-      setAllWords(words);
-      setUserId(user.id);
-      setDataLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  }, [currentUser.accessToken]);
   const [tab, setTab] = React.useState(0);
   const [editWord, setEditWord] = React.useState("");
-  //filter word
-  const handleFilter = (filterBy) => {
-    if (filterBy.order === "Descending") {
-      console.log("Descending1");
-      console.log(allWords);
-      setAllWords(allWords.reverse());
-      setTab(1);
-      setTab(0);
-      // handleClose()
-    }
+  const fetchData = async () => {
+    const querySnapshot = await getDocs(collection(db, "Todos"));
+    let data = [];
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      data.push(doc.data());
+    });
+    setAllWords(data);
   };
+  useEffect(() => {
+    fetchData();
+  }, []);
+  fetchData();
+  console.log(allWord);
   return (
     <Box
       sx={{
@@ -83,7 +73,6 @@ export default function Homepage() {
             }}
           >
             <SearchBar
-              handleFilter={handleFilter}
               allWords={allWords}
               setAllWords={setAllWords}
               searchWord={searchWord}
@@ -102,7 +91,7 @@ export default function Homepage() {
           />
         </>
       )}
-      {tab === 5 && <AddNewWord userId={userId} setTab={setTab} />}
+      {tab === 5 && <AddNewWord userId={userId} setTab={setTab}/>}
       {tab === "editTab" && <EditWord editWord={editWord} setTab={setTab} />}
       {tab === 1 && <Dictionary />}
       {tab === 2 && <Practice />}

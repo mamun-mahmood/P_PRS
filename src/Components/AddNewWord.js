@@ -1,7 +1,19 @@
-import { Button, Divider, Grid, IconButton, TextField } from "@mui/material";
+import {
+  Button,
+  Divider,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
+import db from "./Firebase";
+import { addDoc, collection, serverTimestamp} from "firebase/firestore"; 
 const AddNewWord = ({ setTab, userId }) => {
   const date = new Date();
   const [formData, setFormData] = useState({
@@ -12,19 +24,18 @@ const AddNewWord = ({ setTab, userId }) => {
     console.log(formData);
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
-  const handleSubmit = () => {
-    axios
-      .post(
-        "https://us-east-1.aws.data.mongodb-api.com/app/realmappwordstore-mgzfz/endpoint/addNewWord",
-        formData
-      )
-      .then((res) => {
-        console.log(res);
-        setTab(0);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const handleSubmit = async () => {
+    const docPost = await addDoc(collection(db, "Todos"), {
+      name: formData?.name,
+      status: formData?.status,
+      priority: formData?.priority,
+      description: formData?.description,
+      timestamp: serverTimestamp(),
+
+    });
+    if (docPost.id) {
+      setTab(0)
+    }
   };
   return (
     <div
@@ -34,14 +45,16 @@ const AddNewWord = ({ setTab, userId }) => {
         height: "100vh",
       }}
     >
-      <div style={{
-        position: "sticky",
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "white",
-        zIndex: "1000",
-      }}>
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: "white",
+          zIndex: "1000",
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -63,7 +76,7 @@ const AddNewWord = ({ setTab, userId }) => {
             Cancel
           </Button>
           <h4 style={{ fontSize: "18px", marginBottom: "10px" }}>
-            Add New Word
+            Add New Todo
           </h4>
           <Button
             variant="outlined"
@@ -82,35 +95,57 @@ const AddNewWord = ({ setTab, userId }) => {
         <Divider />
       </div>
       <div>
-        <Grid container spacing={1}>
-          <Grid item xs={6}>
+        <Grid container spacing={1} mt={1}>
+          <Grid item xs={12}>
             <TextField
               fullWidth
               id="standard-basic"
-              label="Word"
+              label="Name"
               variant="standard"
-              name="word"
+              name="name"
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={6}>
-            <TextField
-              fullWidth
-              id="standard-basic"
-              label="Parts of speech"
-              variant="standard"
-              name="partsOfSpeech"
-              onChange={handleChange}
-            />
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Prority</InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                name="priority"
+                onChange={handleChange}
+                label="Prority"
+              >
+                <MenuItem value="High">High</MenuItem>
+                <MenuItem value="Medium">Medium</MenuItem>
+                <MenuItem value="Low">Low</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Status</InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                name="status"
+                onChange={handleChange}
+                label="Prority"
+              >
+                <MenuItem value="Pending">Pending</MenuItem>
+                <MenuItem value="On Going">On Going</MenuItem>
+                <MenuItem value="Finished">Finished</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
             <TextField
               fullWidth
               multiline
               id="standard-basic"
-              label="Meaning"
+              label="Description"
               variant="standard"
-              name="meaning"
+              name="description"
               onChange={handleChange}
             />
           </Grid>
@@ -180,7 +215,7 @@ const AddNewWord = ({ setTab, userId }) => {
           >
             <h4>Groups:</h4>
             <TextField
-              //   fullWidth
+              fullWidth
               id="standard-basic"
               label="Add new group"
               variant="standard"

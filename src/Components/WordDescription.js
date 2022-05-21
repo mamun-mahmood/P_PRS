@@ -27,7 +27,7 @@ const WordDescription = ({ setEditWord, setTab, word, index }) => {
     setOpen(false);
   };
   const wordId = {
-    id: word._id.toString()
+    id: word?._id
   }
   const handleDeleteWord = (id) => {
     axios
@@ -51,14 +51,6 @@ const WordDescription = ({ setEditWord, setTab, word, index }) => {
         }}
         secondaryAction={
           <>
-            <IconButton sx={{ ml: 1 }} edge="end" aria-label="comments">
-              <small
-                style={{ display: `${ratingValue > 0 ? "block" : "none"}` }}
-              >
-                {ratingValue}
-              </small>
-              <StarIcon fontSize="small" sx={{ color: "#0e7b65" }} />
-            </IconButton>
             <IconButton
               onClick={handleClickOpen}
               sx={{ ml: 1 }}
@@ -83,11 +75,9 @@ const WordDescription = ({ setEditWord, setTab, word, index }) => {
       >
         <ListItemButton>
           <small style={{ marginRight: "5px" }}>{index + 1}.</small>
-          <h4>{word.word}</h4>
-          {/* <small style={{ marginLeft: "10px" }}>({word.adj})</small> */}
-          <IconButton>
-            <VolumeUpIcon sx={{ color: "#0e7b65" }} fontSize="small" />
-          </IconButton>
+          <h4>{word.name}</h4> 
+          <p style={{marginLeft: "40px"}}><small><span style={{fontWeight: '600'}}>Priority: </span>{word.priority} </small>
+            <small><span style={{fontWeight: '600'}}>Status: </span>{word.status}</small></p>
         </ListItemButton>
       </ListItem>
       {show && (
@@ -99,12 +89,12 @@ const WordDescription = ({ setEditWord, setTab, word, index }) => {
             animation: "fadeIn 0.4s ease-in-out",
           }}
         >
-          <h4>
-            Meaning:
+          <h5>
+            Description:
             <span>
-              <small>{word.meaning}</small>
+              <small>{word.description}</small>
             </span>
-          </h4>
+          </h5>
           <Rating
           readOnly
             name="simple-controlled"

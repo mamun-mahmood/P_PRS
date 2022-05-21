@@ -14,7 +14,6 @@ const EditWord = ({setTab, editWord}) => {
   const handleSubmit = () => {
     axios.post("https://us-east-1.aws.data.mongodb-api.com/app/realmappwordstore-mgzfz/endpoint/updateWord", formData)
     .then(res => {
-      console.log(res);
       setTab(0)
     })
     .catch(err => {

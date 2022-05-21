@@ -43,11 +43,11 @@ export default function CheckboxList({
           marginTop: "50px",
         }}
       >
-        <h4>No word found!</h4>
-        <small>Click the plus icon to add word</small>
+        <h4>No Todo found!</h4>
+        <small>Click the plus icon to add Todo</small>
       </div>
       {allWords.map((word, index) =>
-        searchWord ? (
+        searchWord ? ( 
           word.word === searchWord && (
             <div key={index} style={{ animation: "fadeIn 0.4s ease-in-out" }}>
               <WordDescription
